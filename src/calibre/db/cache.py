@@ -1332,14 +1332,17 @@ class Cache(object):
                 author = self._field_for('authors', book_id, default_value=(_('Unknown'),))[0]
             except IndexError:
                 author = _('Unknown')
-            stream = stream_or_path if hasattr(stream_or_path, 'read') else lopen(stream_or_path, 'rb')
+            # stream = stream_or_path if hasattr(stream_or_path, 'read') else lopen(stream_or_path, 'rb')
 
-            size, fname = self.backend.add_format(book_id, fmt, stream, title, author, path, name)
-            del stream
+            # size, fname = self.backend.add_format(book_id, fmt, stream, title, author, path, name)
+            # del stream
 
-            max_size = self.fields['formats'].table.update_fmt(book_id, fmt, fname, size, self.backend)
-            self.fields['size'].table.update_sizes({book_id: max_size})
-            self._update_last_modified((book_id,))
+            if not hasattr(stream_or_path, 'read'):
+                stream = stream_or_path
+                size, fname = self.backend.add_symlink_format(book_id, fmt, stream, title, author, path, name)
+                max_size = self.fields['formats'].table.update_fmt(book_id, fmt, fname, size, self.backend)
+                self.fields['size'].table.update_sizes({book_id: max_size})
+                self._update_last_modified((book_id,))
 
         if run_hooks:
             # Run post import plugins, the write lock is released so the plugin
@@ -1978,4 +1981,3 @@ class Cache(object):
                 report_progress(i+1, len(book_ids), mi)
 
     # }}}
-

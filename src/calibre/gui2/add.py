@@ -265,16 +265,24 @@ class DBAdder(QObject):  # {{{
             self.infos.append(mi)
         return mi.title
 
+    # def add_formats(self, id, formats, replace=True):
+    #     for path in formats:
+    #         fmt = os.path.splitext(path)[-1].replace('.', '').upper()
+    #         with open(path, 'rb') as f:
+    #             # At this point, the filetype on import plugins have already
+    #             # been run by the metadata reading code, so we only need to run
+    #             # the postimport plugins, on a successful add.
+    #             if self.db.add_format(id, fmt, f, index_is_id=True, notify=False, replace=replace):
+    #                 run_plugins_on_postimport(self.db, id, fmt)
+
     def add_formats(self, id, formats, replace=True):
         for path in formats:
             fmt = os.path.splitext(path)[-1].replace('.', '').upper()
-            with open(path, 'rb') as f:
-                # At this point, the filetype on import plugins have already
-                # been run by the metadata reading code, so we only need to run
-                # the postimport plugins, on a successful add.
-                if self.db.add_format(id, fmt, f, index_is_id=True, notify=False, replace=replace):
-                    run_plugins_on_postimport(self.db, id, fmt)
-
+            # At this point, the filetype on import plugins have already
+            # been run by the metadata reading code, so we only need to run
+            # the postimport plugins, on a successful add.
+            self.db.add_format(id, fmt, path, index_is_id=True,
+                                       notify=False, replace=replace)
 # }}}
 
 class Adder(QObject):  # {{{
@@ -580,5 +588,3 @@ class Saver(QObject):  # {{{
         if not ok:
             self.failures.add((title, tb))
 # }}}
-
-

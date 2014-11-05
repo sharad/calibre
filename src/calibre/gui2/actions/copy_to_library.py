@@ -119,12 +119,19 @@ class Worker(Thread):  # {{{
 
         self.done()
 
+    # def add_formats(self, id_, paths, newdb, replace=True):
+    #     for path in paths:
+    #         fmt = os.path.splitext(path)[-1].replace('.', '').upper()
+    #         with open(path, 'rb') as f:
+    #             newdb.add_format(id_, fmt, f, index_is_id=True,
+    #                     notify=False, replace=replace)
+
     def add_formats(self, id_, paths, newdb, replace=True):
         for path in paths:
             fmt = os.path.splitext(path)[-1].replace('.', '').upper()
-            with open(path, 'rb') as f:
-                newdb.add_format(id_, fmt, f, index_is_id=True,
-                        notify=False, replace=replace)
+            print("\npath: ",  path, " fmt: ", fmt)
+            newdb.add_symlink_format(id_, fmt, path, index_is_id=True,
+                                     notify=False, replace=replace)
 
     def doit(self):
         from calibre.db.legacy import LibraryDatabase
@@ -488,5 +495,3 @@ class CopyToLibraryAction(InterfaceAction):
         warning_dialog(self.gui, _('Not allowed'),
                     _('You cannot use other libraries while using the environment'
                       ' variable CALIBRE_OVERRIDE_DATABASE_PATH.'), show=True)
-
-
